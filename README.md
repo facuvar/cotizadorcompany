@@ -44,7 +44,7 @@ Sistema avanzado de cotización para ascensores, montacargas y salvaescaleras co
 ## 🚀 Instalación y Configuración
 
 ### 1. Clonar el Repositorio
-```bash
+   ```bash
 git clone https://github.com/tu-usuario/company-presupuestos-online-2.git
 cd company-presupuestos-online-2
 ```
@@ -52,9 +52,9 @@ cd company-presupuestos-online-2
 ### 2. Configuración Local
 1. Importar la base de datos desde `database/company_presupuestos.sql`
 2. Configurar `config.php` con tus credenciales locales:
-```php
+   ```php
 <?php
-define('DB_HOST', 'localhost');
+   define('DB_HOST', 'localhost');
 define('DB_NAME', 'company_presupuestos');
 define('DB_USER', 'root');
 define('DB_PASS', '');
@@ -63,7 +63,7 @@ define('DB_PASS', '');
 
 ### 3. Despliegue en Railway
 1. Ejecutar el script de sincronización:
-```bash
+   ```bash
 php deploy_railway.php
 ```
 2. Verificar la sincronización de datos
