@@ -1,0 +1,18 @@
+{
+    "total_categorias": 3,
+    "total_ascensores": 55,
+    "total_adicionales": 52,
+    "filtrado_inteligente": {
+        "electromecanicos": 27,
+        "hidraulicos": 22,
+        "montacargas": 2,
+        "salvaescaleras": 1,
+        "que_restan": 6
+    },
+    "precios_por_plazo": {
+        "90_dias": 107,
+        "160_dias": 107,
+        "270_dias": 107
+    },
+    "fecha_preparacion": "2025-06-03 19:00:34"
+}

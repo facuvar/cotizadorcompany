@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Redirigir a versión moderna por defecto
+RewriteRule ^$ index_moderno.php [L]
+
+# Prevenir acceso directo a archivos del sistema
+RewriteRule ^sistema/ - [F,L]
+
+# Manejar errores
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html

@@ -1,0 +1,93 @@
+# Archivos de configuración sensibles
+config.php
+config_local.php
+config_railway.php
+
+# Archivos de base de datos
+*.sql
+*.db
+*.sqlite
+
+# Logs
+*.log
+logs/
+error.log
+access.log
+
+# Archivos temporales
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de backup
+*.bak
+*.backup
+backup/
+
+# Archivos de caché
+cache/
+*.cache
+
+# Archivos de sesión PHP
+sessions/
+
+# Archivos de uploads (si los hay)
+uploads/
+files/
+
+# Node modules (si se usa)
+node_modules/
+package-lock.json
+
+# Composer (si se usa)
+vendor/
+composer.lock
+
+# Variables de entorno
+.env
+.env.local
+.env.production
+
+# Archivos de logs
+*_debug.log
+presupuestos_debug.log
+adicionales_debug.log
+pdf_debug.log
+
+# Archivos de Excel temporales
+~$*.xlsx
+~$*.xls
+
+# Archivos PDF generados
+presupuestos/*.pdf
+
+# Archivos de configuración local
+.env
+.env.local
+
+# Directorios de backups
+backups/
+
+# Archivos específicos del proyecto que no deben subirse
+plantilla_importacion.xlsx
+formato_excel_ejemplo.html
+
+# Archivos de configuración de Railway (se incluyen)
+# railway.json
+# nixpacks.toml
+
+# Archivos de prueba local
+setup_results.html 

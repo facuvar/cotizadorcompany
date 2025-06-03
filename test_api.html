@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e9; color: #2e7d32; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test API get_all_options.php</h1>
+    
+    <button onclick="testAPI()">🔄 Probar API</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function log(message, type = 'debug') {
+            const div = document.createElement('div');
+            div.className = `debug ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        function testAPI() {
+            document.getElementById('results').innerHTML = '';
+            log('🚀 Iniciando test del API...');
+            
+            fetch('get_all_options.php')
+                .then(response => {
+                    log(`📡 Respuesta HTTP: ${response.status} ${response.statusText}`, 'success');
+                    log(`📏 Tamaño: ${response.headers.get('content-length') || 'desconocido'} bytes`);
+                    log(`📋 Content-Type: ${response.headers.get('content-type')}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    return response.text();
+                })
+                .then(text => {
+                    log(`📄 Texto recibido (${text.length} caracteres):`);
+                    log(`<pre>${text.substring(0, 1000)}${text.length > 1000 ? '...' : ''}</pre>`);
+                    
+                    try {
+                        const data = JSON.parse(text);
+                        log('✅ JSON válido parseado', 'success');
+                        
+                        if (data.success) {
+                            log(`🎯 Datos del servidor:`, 'success');
+                            log(`- Total opciones: ${data.debug.total_opciones}`);
+                            log(`- Categorías: [${data.debug.categorias_con_datos.join(', ')}]`);
+                            log(`- Timestamp: ${data.debug.timestamp}`);
+                            
+                            // Mostrar estructura de datos
+                            Object.keys(data.data).forEach(categoriaId => {
+                                const opciones = data.data[categoriaId];
+                                log(`📂 Categoría ${categoriaId}: ${opciones.length} opciones`);
+                                
+                                if (opciones.length > 0) {
+                                    const primera = opciones[0];
+                                    log(`  └─ Ejemplo: "${primera.nombre}" (90d: $${primera.precio_90_dias}, 160d: $${primera.precio_160_dias}, 270d: $${primera.precio_270_dias})`);
+                                }
+                            });
+                            
+                        } else {
+                            log(`❌ Error del servidor: ${data.error}`, 'error');
+                        }
+                        
+                    } catch (e) {
+                        log(`❌ Error parseando JSON: ${e.message}`, 'error');
+                        log(`🔍 Primeros 500 caracteres del texto:`);
+                        log(`<pre>${text.substring(0, 500)}</pre>`);
+                    }
+                })
+                .catch(error => {
+                    log(`❌ Error en fetch: ${error.message}`, 'error');
+                });
+        }
+        
+        // Auto-ejecutar al cargar
+        window.addEventListener('load', testAPI);
+    </script>
+</body>
+</html> 

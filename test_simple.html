@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Simple - Cotizador con Filtrado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-title {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-description {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2196f3;
+        }
+        .test-steps {
+            background: #f3e5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #9c27b0;
+        }
+        .test-steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .test-steps li {
+            margin-bottom: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #2196f3;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background: #1976d2;
+        }
+        .btn-success {
+            background: #4caf50;
+        }
+        .btn-success:hover {
+            background: #388e3c;
+        }
+        .test-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .feature-highlight {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">🔧 Prueba del Filtrado de Adicionales</h1>
+        
+        <div class="test-description">
+            <h3>📋 ¿Qué se ha implementado?</h3>
+            <p><strong>Filtrado inteligente de adicionales:</strong> Cuando seleccionas un ascensor, automáticamente se filtran los adicionales para mostrar solo aquellos relevantes según el tipo:</p>
+            <ul style="margin-top: 10px;">
+                <li><strong>Electromecánico o Gearless:</strong> Solo adicionales con "electromecanico" en el título</li>
+                <li><strong>Hidráulico:</strong> Solo adicionales con "hidraulico" en el título</li>
+                <li><strong>Montacargas:</strong> Solo adicionales con "montacargas" en el título</li>
+                <li><strong>Salvaescaleras:</strong> Solo adicionales con "salvaescaleras" en el título</li>
+            </ul>
+        </div>
+
+        <div style="background: #fff8e1; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
+            <h4 style="color: #e65100; margin-top: 0;">💰 Adicionales que Restan Dinero</h4>
+            <p><strong>Nueva funcionalidad:</strong> Los adicionales que contienen la palabra "RESTAR" en su título ahora descuentan dinero del total en lugar de sumarlo.</p>
+            <p><strong>Ejemplos:</strong></p>
+            <ul>
+                <li>CABINA EN CHAPA C/DETALLES RESTAR</li>
+                <li>PB Y PUERTA DE CABINA EN CHAPA RESTAR</li>
+            </ul>
+            <p><strong>Visualización:</strong> Estos adicionales se muestran con precio negativo (-AR$) en color naranja para identificarlos fácilmente.</p>
+        </div>
+
+        <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50;">
+            <h4 style="color: #2e7d32; margin-top: 0;">⏰ Plazo de Entrega Unificado</h4>
+            <p><strong>Nueva funcionalidad:</strong> Cuando seleccionas un plazo de entrega (90, 160 o 270 días), TODOS los productos (ascensores y adicionales) usan automáticamente el mismo plazo.</p>
+            <p><strong>Beneficios:</strong></p>
+            <ul>
+                <li>Consistencia total en la cotización</li>
+                <li>No hay mezcla de plazos diferentes</li>
+                <li>Precios actualizados automáticamente</li>
+                <li>Cálculos precisos y coherentes</li>
+            </ul>
+            <p><strong>Funcionamiento:</strong> Al cambiar el plazo, todos los precios se recalculan instantáneamente para mantener la coherencia.</p>
+        </div>
+
+        <div class="feature-highlight">
+            <h4>✨ Nueva Funcionalidad:</h4>
+            <ul>
+                <li><strong>Filtrado automático completo:</strong> Electromecánico/Gearless → electromecánicos, Hidráulico → hidráulicos, Montacargas → montacargas, Salvaescaleras → salvaescaleras</li>
+                <li><strong>Adicionales que restan:</strong> Los adicionales con "RESTAR" en el título descuentan dinero del total (ej: CABINA EN CHAPA C/DETALLES RESTAR)</li>
+                <li><strong>Visualización clara:</strong> Los precios negativos se muestran en color naranja con signo "-"</li>
+                <li><strong>Plazo unificado:</strong> Todos los productos usan automáticamente el mismo plazo de entrega seleccionado</li>
+                <li><strong>Actualización automática:</strong> Al cambiar el plazo, todos los precios se recalculan instantáneamente</li>
+                <li><strong>Reseteo inteligente:</strong> Al deseleccionar ascensores, se muestran todos los adicionales disponibles</li>
+                <li><strong>Experiencia mejorada:</strong> Interface más limpia y relevante para el usuario</li>
+            </ul>
+        </div>
+
+        <div class="test-steps">
+            <h3>🧪 Pasos para probar:</h3>
+            <ol>
+                <li><strong>Abre el cotizador</strong> usando el botón de abajo</li>
+                <li><strong>Observa los adicionales iniciales</strong> - deberían mostrarse todos</li>
+                <li><strong>Selecciona un ascensor electromecánico</strong> - los adicionales se filtrarán para mostrar solo electromecánicos</li>
+                <li><strong>Selecciona un ascensor gearless</strong> - los adicionales seguirán filtrados para electromecánicos</li>
+                <li><strong>Selecciona un ascensor hidráulico</strong> - los adicionales se filtrarán para mostrar solo hidráulicos</li>
+                <li><strong>Selecciona un montacargas</strong> - los adicionales se filtrarán para mostrar solo de montacargas</li>
+                <li><strong>Selecciona un salvaescaleras</strong> - los adicionales se filtrarán para mostrar solo de salvaescaleras</li>
+                <li><strong>Busca adicionales con "RESTAR"</strong> - deberían mostrarse con precio negativo en color naranja</li>
+                <li><strong>Selecciona un adicional que resta</strong> - observa cómo disminuye el total en lugar de aumentar</li>
+                <li><strong>Cambia el plazo de entrega</strong> - observa cómo TODOS los precios se actualizan automáticamente</li>
+                <li><strong>Verifica la consistencia</strong> - todos los productos deben usar el mismo plazo seleccionado</li>
+                <li><strong>Deselecciona el ascensor</strong> - todos los adicionales deberían aparecer nuevamente</li>
+                <li><strong>Prueba el botón "Reiniciar"</strong> - debería resetear todo correctamente</li>
+            </ol>
+        </div>
+
+        <div class="test-links">
+            <a href="cotizador_ordenado.php" class="btn btn-success" target="_blank">
+                🚀 Abrir Cotizador con Filtrado
+            </a>
+            <a href="cotizador.php" class="btn" target="_blank">
+                📊 Cotizador Original (Comparar)
+            </a>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+            <h4>🎯 Resultado Esperado:</h4>
+            <p>Los adicionales se filtrarán dinámicamente basándose en el tipo de ascensor seleccionado:</p>
+            <ul style="text-align: left; max-width: 500px; margin: 10px auto;">
+                <li><strong>Electromecánico/Gearless:</strong> Solo adicionales electromecánicos</li>
+                <li><strong>Hidráulico:</strong> Solo adicionales hidráulicos</li>
+                <li><strong>Montacargas:</strong> Solo adicionales de montacargas</li>
+                <li><strong>Salvaescaleras:</strong> Solo adicionales de salvaescaleras</li>
+                <li><strong>Sin selección:</strong> Todos los adicionales disponibles</li>
+            </ul>
+            <p style="margin-top: 15px;">Esto mejora significativamente la experiencia del usuario al mostrar solo opciones relevantes para cada tipo de equipo.</p>
+        </div>
+    </div>
+
+    <script>
+        // Agregar un poco de interactividad para la página de prueba
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Página de prueba cargada');
+            console.log('✅ Filtrado de adicionales implementado');
+            console.log('🔄 Listo para probar funcionalidad');
+        });
+    </script>
+</body>
+</html> 

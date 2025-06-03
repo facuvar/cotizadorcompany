@@ -1,0 +1,42 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "php -S 0.0.0.0:$PORT",
+    "healthcheckPath": "/cotizador.php",
+    "healthcheckTimeout": 100,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "DB_HOST": "autorack.proxy.rlwy.net",
+        "DB_PORT": "47470",
+        "DB_NAME": "railway",
+        "DB_USER": "root",
+        "FILTRADO_INTELIGENTE_ENABLED": "true",
+        "ADICIONALES_RESTAR_ENABLED": "true",
+        "PLAZO_UNIFICADO_ENABLED": "true",
+        "DEBUG_MODE": "false",
+        "LOG_QUERIES": "false"
+      }
+    },
+    "development": {
+      "variables": {
+        "DB_HOST": "localhost",
+        "DB_PORT": "3306",
+        "DB_NAME": "company_presupuestos",
+        "DB_USER": "root",
+        "DB_PASS": "",
+        "FILTRADO_INTELIGENTE_ENABLED": "true",
+        "ADICIONALES_RESTAR_ENABLED": "true",
+        "PLAZO_UNIFICADO_ENABLED": "true",
+        "DEBUG_MODE": "true",
+        "LOG_QUERIES": "true"
+      }
+    }
+  }
+} 
