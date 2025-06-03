@@ -248,4 +248,19 @@ Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
 
 ---
 
-🚀 **¡El cotizador inteligente está listo para revolucionar tus cotizaciones de ascensores!** 
+🚀 **¡El cotizador inteligente está listo para revolucionar tus cotizaciones de ascensores!**
+
+## 🌐 Deploy Automático
+
+- **GitHub:** https://github.com/facuvar/cotizadorcompany
+- **Railway:** https://cotizadorcompany-production.up.railway.app
+- **Auto-deploy:** Configurado desde GitHub ✅
+
+## 📋 Scripts Disponibles
+
+- `setup_railway_completo_v2.php` - Setup con manejo de claves foráneas
+- `diagnostico_conexion.php` - Diagnóstico completo de conexión
+- `cotizador.php` - Aplicación principal
+
+---
+*Última actualización: Deploy automático configurado* 
