@@ -4,7 +4,7 @@ Sistema completo de cotización y presupuestos para ascensores, montacargas y sa
 
 ## 🚀 Características Principales
 
-### ✨ Funcionalidades Avanzadas
+### ✨  Funcionalidades Avanzadas
 - **Filtrado Inteligente**: Los adicionales se muestran automáticamente según el tipo de ascensor seleccionado
 - **Cálculos Dinámicos**: Precios que se actualizan en tiempo real con diferentes plazos de entrega
 - **Gestión de Adicionales**: Soporte para adicionales que suman o restan del precio total
