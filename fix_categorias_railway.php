@@ -1,365 +1,324 @@
 <?php
 /**
- * Script para diagnosticar y corregir el problema de categorías vacías en Railway
+ * 🎯 FIX CATEGORÍAS RAILWAY
+ * 
+ * Solución ultra-simplificada que se enfoca SOLO en crear
+ * la tabla categorias correctamente en Railway
  */
 
-echo "<h1>🔧 DIAGNÓSTICO Y CORRECCIÓN DE CATEGORÍAS</h1>";
-echo "<style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-    .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .success { color: green; background: #e8f5e9; padding: 10px; border-radius: 5px; margin: 10px 0; }
-    .error { color: red; background: #ffebee; padding: 10px; border-radius: 5px; margin: 10px 0; }
-    .info { color: blue; background: #e3f2fd; padding: 10px; border-radius: 5px; margin: 10px 0; }
-    .warning { color: orange; background: #fff3e0; padding: 10px; border-radius: 5px; margin: 10px 0; }
-    .code { background: #f5f5f5; padding: 10px; border-radius: 5px; font-family: monospace; margin: 10px 0; white-space: pre-wrap; }
-    .btn { display: inline-block; padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin: 5px; border: none; cursor: pointer; }
-    .btn:hover { background: #45a049; }
-    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-</style>";
+// Configuración local
+$localConfig = [
+    'host' => 'localhost',
+    'user' => 'root',
+    'pass' => '',
+    'name' => 'company_presupuestos',
+    'port' => 3306
+];
 
-echo "<div class='container'>";
-
-// Paso 1: Cargar configuración
-echo "<h2>📋 Paso 1: Cargar configuración</h2>";
-
-try {
-    require_once 'sistema/config.php';
-    echo "<div class='success'>✅ Configuración cargada correctamente</div>";
-    
-    echo "<div class='info'>";
-    echo "<strong>Configuración detectada:</strong><br>";
-    echo "• IS_RAILWAY: " . (defined('IS_RAILWAY') && IS_RAILWAY ? 'true' : 'false') . "<br>";
-    echo "• DB_HOST: " . (defined('DB_HOST') ? DB_HOST : 'No definido') . "<br>";
-    echo "• DB_USER: " . (defined('DB_USER') ? DB_USER : 'No definido') . "<br>";
-    echo "• DB_NAME: " . (defined('DB_NAME') ? DB_NAME : 'No definido') . "<br>";
-    echo "</div>";
-    
-} catch (Exception $e) {
-    echo "<div class='error'>❌ Error cargando configuración: " . $e->getMessage() . "</div>";
-    exit;
-}
-
-// Paso 2: Conectar a la base de datos
-echo "<h2>🔌 Paso 2: Conectar a la base de datos</h2>";
-
-try {
-    require_once 'sistema/includes/db.php';
-    $db = Database::getInstance();
-    $conn = $db->getConnection();
-    
-    if ($conn && !$conn->connect_error) {
-        echo "<div class='success'>✅ Conexión exitosa a la base de datos</div>";
-        echo "<div class='info'>Versión del servidor: " . $conn->server_info . "</div>";
-    } else {
-        echo "<div class='error'>❌ Error de conexión: " . ($conn ? $conn->connect_error : 'Conexión nula') . "</div>";
-        exit;
-    }
-} catch (Exception $e) {
-    echo "<div class='error'>❌ Error conectando: " . $e->getMessage() . "</div>";
-    exit;
-}
-
-// Paso 3: Verificar estructura de tablas
-echo "<h2>📊 Paso 3: Verificar estructura de tablas</h2>";
-
-$tablas = ['categorias', 'opciones', 'plazos_entrega'];
-$tablasExistentes = [];
-
-foreach ($tablas as $tabla) {
-    $result = $conn->query("SHOW TABLES LIKE '$tabla'");
-    if ($result && $result->num_rows > 0) {
-        echo "<div class='success'>✅ Tabla '$tabla' existe</div>";
-        $tablasExistentes[] = $tabla;
-        
-        // Contar registros
-        $countResult = $conn->query("SELECT COUNT(*) as count FROM `$tabla`");
-        if ($countResult) {
-            $count = $countResult->fetch_assoc()['count'];
-            echo "<div class='info'>📊 Tabla '$tabla': $count registros</div>";
-        }
-    } else {
-        echo "<div class='error'>❌ Tabla '$tabla' no existe</div>";
-    }
-}
-
-// Paso 4: Mostrar contenido actual de categorías
-echo "<h2>📋 Paso 4: Contenido actual de categorías</h2>";
-
-if (in_array('categorias', $tablasExistentes)) {
-    $result = $conn->query("SELECT * FROM categorias ORDER BY orden ASC, id ASC");
-    
-    if ($result && $result->num_rows > 0) {
-        echo "<div class='success'>✅ Categorías encontradas: " . $result->num_rows . "</div>";
-        echo "<table>";
-        echo "<tr><th>ID</th><th>Nombre</th><th>Descripción</th><th>Orden</th></tr>";
-        
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>";
-            echo "<td>" . $row['id'] . "</td>";
-            echo "<td>" . htmlspecialchars($row['nombre']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['descripcion'] ?? '') . "</td>";
-            echo "<td>" . ($row['orden'] ?? 'NULL') . "</td>";
-            echo "</tr>";
-        }
-        echo "</table>";
-    } else {
-        echo "<div class='warning'>⚠️ No hay categorías en la base de datos</div>";
-        
-        // Botón para crear categorías
-        echo "<form method='post' style='margin: 20px 0;'>";
-        echo "<button type='submit' name='crear_categorias' class='btn'>🚀 Crear Categorías Básicas</button>";
-        echo "</form>";
-    }
-}
-
-// Paso 5: Procesar creación de categorías
-if (isset($_POST['crear_categorias'])) {
-    echo "<h2>🚀 Paso 5: Creando categorías básicas</h2>";
-    
+function createCategoriasOnly($config) {
     try {
-        // Limpiar tabla categorías
-        $conn->query("DELETE FROM categorias");
-        echo "<div class='info'>🧹 Tabla categorías limpiada</div>";
+        $dsn = "mysql:host={$config['host']};port={$config['port']};dbname={$config['name']};charset=utf8mb4";
+        $pdo = new PDO($dsn, $config['user'], $config['pass'], [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ]);
         
-        // Categorías básicas para el cotizador
-        $categorias = [
-            ['nombre' => 'ASCENSORES ELECTROMECÁNICOS', 'descripcion' => 'Ascensores con motor eléctrico para edificios residenciales y comerciales', 'orden' => 1],
-            ['nombre' => 'ASCENSORES HIDRÁULICOS', 'descripcion' => 'Ascensores con sistema hidráulico para edificios de baja altura', 'orden' => 2],
-            ['nombre' => 'GIRACOCHES', 'descripcion' => 'Plataformas giratorias para vehículos', 'orden' => 3],
-            ['nombre' => 'Opciones Adicionales', 'descripcion' => 'Accesorios y opciones adicionales para ascensores', 'orden' => 4],
-            ['nombre' => 'Formas de Pago', 'descripcion' => 'Descuentos disponibles según forma de pago', 'orden' => 5]
+        $output = "-- ========================================\n";
+        $output .= "-- FIX CATEGORÍAS RAILWAY - SOLO CATEGORIAS\n";
+        $output .= "-- Fecha: " . date('Y-m-d H:i:s') . "\n";
+        $output .= "-- ========================================\n\n";
+        
+        $output .= "SET FOREIGN_KEY_CHECKS = 0;\n";
+        $output .= "SET SQL_MODE = \"NO_AUTO_VALUE_ON_ZERO\";\n\n";
+        
+        // PASO 1: Eliminar tabla categorias si existe
+        $output .= "-- PASO 1: Eliminar tabla categorias\n";
+        $output .= "DROP TABLE IF EXISTS `categorias`;\n\n";
+        
+        // PASO 2: Crear estructura de tabla categorias
+        $output .= "-- PASO 2: Crear estructura tabla categorias\n";
+        $stmt = $pdo->query("SHOW CREATE TABLE `categorias`");
+        $createTable = $stmt->fetch(PDO::FETCH_ASSOC);
+        $output .= $createTable['Create Table'] . ";\n\n";
+        
+        // PASO 3: Insertar datos de categorias
+        $output .= "-- PASO 3: Insertar datos en categorias\n";
+        $stmt = $pdo->query("SELECT * FROM `categorias`");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (!empty($rows)) {
+            $columns = array_keys($rows[0]);
+            $columnsList = '`' . implode('`, `', $columns) . '`';
+            
+            $output .= "INSERT INTO `categorias` ($columnsList) VALUES\n";
+            
+            $values = [];
+            foreach ($rows as $row) {
+                $rowValues = [];
+                foreach ($row as $value) {
+                    if ($value === null) {
+                        $rowValues[] = 'NULL';
+            } else {
+                        $escaped = addslashes($value);
+                        $escaped = str_replace(["\n", "\r", "\t"], ["\\n", "\\r", "\\t"], $escaped);
+                        $rowValues[] = "'" . $escaped . "'";
+                    }
+                }
+                $values[] = '(' . implode(', ', $rowValues) . ')';
+            }
+            
+            $output .= implode(",\n", $values) . ";\n\n";
+        }
+        
+        $output .= "SET FOREIGN_KEY_CHECKS = 1;\n";
+        $output .= "\n-- ========================================\n";
+        $output .= "-- TABLA CATEGORIAS CREADA EXITOSAMENTE\n";
+        $output .= "-- Registros: " . count($rows) . "\n";
+        $output .= "-- ========================================\n";
+        
+        return [
+            'success' => true,
+            'sql' => $output,
+            'records' => count($rows),
+            'size' => strlen($output)
         ];
         
-        foreach ($categorias as $cat) {
-            $stmt = $conn->prepare("INSERT INTO categorias (nombre, descripcion, orden) VALUES (?, ?, ?)");
-            $stmt->bind_param('ssi', $cat['nombre'], $cat['descripcion'], $cat['orden']);
-            
-            if ($stmt->execute()) {
-                $categoriaId = $conn->insert_id;
-                echo "<div class='success'>✅ Categoría creada: " . $cat['nombre'] . " (ID: $categoriaId)</div>";
-            } else {
-                echo "<div class='error'>❌ Error creando categoría " . $cat['nombre'] . ": " . $stmt->error . "</div>";
-            }
-        }
-        
-        echo "<div class='info'>🔄 Recargando página para mostrar cambios...</div>";
-        echo "<script>setTimeout(function(){ window.location.reload(); }, 2000);</script>";
-        
     } catch (Exception $e) {
-        echo "<div class='error'>❌ Error creando categorías: " . $e->getMessage() . "</div>";
-    }
-}
-
-// Paso 6: Crear opciones básicas si hay categorías
-if (isset($_POST['crear_opciones'])) {
-    echo "<h2>🛠️ Paso 6: Creando opciones básicas</h2>";
-    
-    try {
-        // Limpiar tabla opciones
-        $conn->query("DELETE FROM opciones");
-        echo "<div class='info'>🧹 Tabla opciones limpiada</div>";
-        
-        // Obtener IDs de categorías
-        $categoriaIds = [];
-        $result = $conn->query("SELECT id, nombre FROM categorias");
-        while ($row = $result->fetch_assoc()) {
-            $categoriaIds[$row['nombre']] = $row['id'];
-        }
-        
-        // Opciones para ASCENSORES ELECTROMECÁNICOS
-        if (isset($categoriaIds['ASCENSORES ELECTROMECÁNICOS'])) {
-            $opciones = [
-                ['nombre' => 'Ascensor 4 personas - 4 paradas', 'descripcion' => 'Ascensor electromecánico para 4 personas, 4 paradas', 'precio' => 2500000.00, 'orden' => 1],
-                ['nombre' => 'Ascensor 6 personas - 4 paradas', 'descripcion' => 'Ascensor electromecánico para 6 personas, 4 paradas', 'precio' => 3000000.00, 'orden' => 2],
-                ['nombre' => 'Ascensor 4 personas - 6 paradas', 'descripcion' => 'Ascensor electromecánico para 4 personas, 6 paradas', 'precio' => 3200000.00, 'orden' => 3],
-                ['nombre' => 'Ascensor 6 personas - 6 paradas', 'descripcion' => 'Ascensor electromecánico para 6 personas, 6 paradas', 'precio' => 3800000.00, 'orden' => 4]
-            ];
-            
-            foreach ($opciones as $opcion) {
-                $stmt = $conn->prepare("INSERT INTO opciones (categoria_id, nombre, descripcion, precio, orden, es_obligatorio) VALUES (?, ?, ?, ?, ?, 0)");
-                $stmt->bind_param('issdi', $categoriaIds['ASCENSORES ELECTROMECÁNICOS'], $opcion['nombre'], $opcion['descripcion'], $opcion['precio'], $opcion['orden']);
-                
-                if ($stmt->execute()) {
-                    echo "<div class='success'>✅ Opción creada: " . $opcion['nombre'] . "</div>";
-                } else {
-                    echo "<div class='error'>❌ Error creando opción: " . $stmt->error . "</div>";
-                }
-            }
-        }
-        
-        // Opciones para ASCENSORES HIDRÁULICOS
-        if (isset($categoriaIds['ASCENSORES HIDRÁULICOS'])) {
-            $opciones = [
-                ['nombre' => 'Hidráulico 450kg - 3 paradas', 'descripcion' => 'Ascensor hidráulico 450kg, 3 paradas', 'precio' => 2200000.00, 'orden' => 1],
-                ['nombre' => 'Hidráulico 630kg - 3 paradas', 'descripcion' => 'Ascensor hidráulico 630kg, 3 paradas', 'precio' => 2600000.00, 'orden' => 2],
-                ['nombre' => 'Hidráulico 450kg - 4 paradas', 'descripcion' => 'Ascensor hidráulico 450kg, 4 paradas', 'precio' => 2800000.00, 'orden' => 3]
-            ];
-            
-            foreach ($opciones as $opcion) {
-                $stmt = $conn->prepare("INSERT INTO opciones (categoria_id, nombre, descripcion, precio, orden, es_obligatorio) VALUES (?, ?, ?, ?, ?, 0)");
-                $stmt->bind_param('issdi', $categoriaIds['ASCENSORES HIDRÁULICOS'], $opcion['nombre'], $opcion['descripcion'], $opcion['precio'], $opcion['orden']);
-                
-                if ($stmt->execute()) {
-                    echo "<div class='success'>✅ Opción creada: " . $opcion['nombre'] . "</div>";
-                } else {
-                    echo "<div class='error'>❌ Error creando opción: " . $stmt->error . "</div>";
-                }
-            }
-        }
-        
-        // Opciones para GIRACOCHES
-        if (isset($categoriaIds['GIRACOCHES'])) {
-            $opciones = [
-                ['nombre' => 'Giracoches 2000kg', 'descripcion' => 'Plataforma giratoria para vehículos hasta 2000kg', 'precio' => 1800000.00, 'orden' => 1],
-                ['nombre' => 'Giracoches 3000kg', 'descripcion' => 'Plataforma giratoria para vehículos hasta 3000kg', 'precio' => 2200000.00, 'orden' => 2]
-            ];
-            
-            foreach ($opciones as $opcion) {
-                $stmt = $conn->prepare("INSERT INTO opciones (categoria_id, nombre, descripcion, precio, orden, es_obligatorio) VALUES (?, ?, ?, ?, ?, 0)");
-                $stmt->bind_param('issdi', $categoriaIds['GIRACOCHES'], $opcion['nombre'], $opcion['descripcion'], $opcion['precio'], $opcion['orden']);
-                
-                if ($stmt->execute()) {
-                    echo "<div class='success'>✅ Opción creada: " . $opcion['nombre'] . "</div>";
-                } else {
-                    echo "<div class='error'>❌ Error creando opción: " . $stmt->error . "</div>";
-                }
-            }
-        }
-        
-        // Opciones adicionales
-        if (isset($categoriaIds['Opciones Adicionales'])) {
-            $opciones = [
-                ['nombre' => 'Puertas automáticas', 'descripcion' => 'Sistema de puertas automáticas', 'precio' => 150000.00, 'orden' => 1],
-                ['nombre' => 'Espejo en cabina', 'descripcion' => 'Espejo decorativo en cabina', 'precio' => 25000.00, 'orden' => 2],
-                ['nombre' => 'Iluminación LED', 'descripcion' => 'Sistema de iluminación LED', 'precio' => 80000.00, 'orden' => 3]
-            ];
-            
-            foreach ($opciones as $opcion) {
-                $stmt = $conn->prepare("INSERT INTO opciones (categoria_id, nombre, descripcion, precio, orden, es_obligatorio) VALUES (?, ?, ?, ?, ?, 0)");
-                $stmt->bind_param('issdi', $categoriaIds['Opciones Adicionales'], $opcion['nombre'], $opcion['descripcion'], $opcion['precio'], $opcion['orden']);
-                
-                if ($stmt->execute()) {
-                    echo "<div class='success'>✅ Opción adicional creada: " . $opcion['nombre'] . "</div>";
-                } else {
-                    echo "<div class='error'>❌ Error creando opción adicional: " . $stmt->error . "</div>";
-                }
-            }
-        }
-        
-        // Formas de pago
-        if (isset($categoriaIds['Formas de Pago'])) {
-            $opciones = [
-                ['nombre' => 'Contado (10% descuento)', 'descripcion' => 'Pago al contado con 10% de descuento', 'precio' => -10.00, 'orden' => 1],
-                ['nombre' => 'Financiado 12 meses', 'descripcion' => 'Financiación a 12 meses sin interés', 'precio' => 0.00, 'orden' => 2],
-                ['nombre' => 'Financiado 24 meses', 'descripcion' => 'Financiación a 24 meses con 5% de recargo', 'precio' => 5.00, 'orden' => 3]
-            ];
-            
-            foreach ($opciones as $opcion) {
-                $stmt = $conn->prepare("INSERT INTO opciones (categoria_id, nombre, descripcion, precio, orden, es_obligatorio) VALUES (?, ?, ?, ?, ?, 0)");
-                $stmt->bind_param('issdi', $categoriaIds['Formas de Pago'], $opcion['nombre'], $opcion['descripcion'], $opcion['precio'], $opcion['orden']);
-                
-                if ($stmt->execute()) {
-                    echo "<div class='success'>✅ Forma de pago creada: " . $opcion['nombre'] . "</div>";
-                } else {
-                    echo "<div class='error'>❌ Error creando forma de pago: " . $stmt->error . "</div>";
-                }
-            }
-        }
-        
-        echo "<div class='info'>🔄 Recargando página para mostrar cambios...</div>";
-        echo "<script>setTimeout(function(){ window.location.reload(); }, 2000);</script>";
-        
-    } catch (Exception $e) {
-        echo "<div class='error'>❌ Error creando opciones: " . $e->getMessage() . "</div>";
-    }
-}
-
-// Mostrar botón para crear opciones si hay categorías pero no opciones
-if (in_array('categorias', $tablasExistentes) && in_array('opciones', $tablasExistentes)) {
-    $categoriaCount = $conn->query("SELECT COUNT(*) as count FROM categorias")->fetch_assoc()['count'];
-    $opcionCount = $conn->query("SELECT COUNT(*) as count FROM opciones")->fetch_assoc()['count'];
-    
-    if ($categoriaCount > 0 && $opcionCount == 0) {
-        echo "<h2>🛠️ Crear opciones básicas</h2>";
-        echo "<div class='warning'>⚠️ Hay categorías pero no hay opciones. Es necesario crear opciones para que el cotizador funcione.</div>";
-        echo "<form method='post' style='margin: 20px 0;'>";
-        echo "<button type='submit' name='crear_opciones' class='btn'>🛠️ Crear Opciones Básicas</button>";
-        echo "</form>";
-    }
-}
-
-// Paso 7: Verificar plazos de entrega
-echo "<h2>⏰ Paso 7: Verificar plazos de entrega</h2>";
-
-if (in_array('plazos_entrega', $tablasExistentes)) {
-    $result = $conn->query("SELECT * FROM plazos_entrega ORDER BY id ASC");
-    
-    if ($result && $result->num_rows > 0) {
-        echo "<div class='success'>✅ Plazos de entrega encontrados: " . $result->num_rows . "</div>";
-        echo "<table>";
-        echo "<tr><th>ID</th><th>Nombre</th><th>Multiplicador</th></tr>";
-        
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>";
-            echo "<td>" . $row['id'] . "</td>";
-            echo "<td>" . htmlspecialchars($row['nombre']) . "</td>";
-            echo "<td>" . ($row['multiplicador'] ?? '1.00') . "</td>";
-            echo "</tr>";
-        }
-        echo "</table>";
-    } else {
-        echo "<div class='warning'>⚠️ No hay plazos de entrega configurados</div>";
-        
-        // Crear plazos básicos
-        echo "<form method='post' style='margin: 20px 0;'>";
-        echo "<button type='submit' name='crear_plazos' class='btn'>⏰ Crear Plazos Básicos</button>";
-        echo "</form>";
-    }
-}
-
-// Procesar creación de plazos
-if (isset($_POST['crear_plazos'])) {
-    echo "<h2>⏰ Creando plazos básicos</h2>";
-    
-    try {
-        $conn->query("DELETE FROM plazos_entrega");
-        echo "<div class='info'>🧹 Tabla plazos_entrega limpiada</div>";
-        
-        $plazos = [
-            ['nombre' => '90 días', 'multiplicador' => 1.15],
-            ['nombre' => '160-180 días', 'multiplicador' => 1.00],
-            ['nombre' => '270 días', 'multiplicador' => 0.85]
+        return [
+            'success' => false,
+            'error' => $e->getMessage()
         ];
-        
-        foreach ($plazos as $plazo) {
-            $stmt = $conn->prepare("INSERT INTO plazos_entrega (nombre, multiplicador) VALUES (?, ?)");
-            $stmt->bind_param('sd', $plazo['nombre'], $plazo['multiplicador']);
-            
-            if ($stmt->execute()) {
-                echo "<div class='success'>✅ Plazo creado: " . $plazo['nombre'] . "</div>";
-            } else {
-                echo "<div class='error'>❌ Error creando plazo: " . $stmt->error . "</div>";
-            }
-        }
-        
-        echo "<div class='info'>🔄 Recargando página para mostrar cambios...</div>";
-        echo "<script>setTimeout(function(){ window.location.reload(); }, 2000);</script>";
-        
-    } catch (Exception $e) {
-        echo "<div class='error'>❌ Error creando plazos: " . $e->getMessage() . "</div>";
     }
 }
 
-// Paso 8: Enlaces de prueba
-echo "<h2>🔗 Enlaces de prueba</h2>";
-echo "<div class='info'>";
-echo "<strong>Prueba el cotizador:</strong><br>";
-echo "<a href='sistema/cotizador.php' target='_blank' style='color: blue; text-decoration: underline;'>🚀 Ir al Cotizador</a><br>";
-echo "<a href='admin/' target='_blank' style='color: blue; text-decoration: underline;'>🔐 Panel Admin</a><br>";
-echo "<a href='railway_debug.php' target='_blank' style='color: blue; text-decoration: underline;'>🔍 Diagnóstico Railway</a><br>";
-echo "</div>";
+// Procesar exportación
+$export = null;
+$downloadReady = false;
 
-echo "</div>";
-?> 
+if (isset($_POST['export'])) {
+    $export = createCategoriasOnly($localConfig);
+    
+    if ($export['success']) {
+        $filename = 'fix_categorias_railway_' . date('Y-m-d_H-i-s') . '.sql';
+        file_put_contents($filename, $export['sql']);
+        $downloadReady = true;
+    }
+}
+
+// Descargar archivo
+if (isset($_GET['download']) && file_exists($_GET['download'])) {
+    $filename = $_GET['download'];
+    header('Content-Type: application/sql');
+    header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
+    header('Content-Length: ' . filesize($filename));
+    readfile($filename);
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Fix Categorías Railway</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #e74c3c;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .success { background: #d4edda; border-left-color: #28a745; color: #155724; }
+        .error { background: #f8d7da; border-left-color: #dc3545; color: #721c24; }
+        .warning { background: #fff3cd; border-left-color: #ffc107; color: #856404; }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #e74c3c;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 5px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn:hover { background: #c0392b; }
+        .btn-primary { background: #007bff; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #1e7e34; }
+        
+        .highlight {
+            background: #fff5f5;
+            border: 2px solid #e74c3c;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .code-box {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Fix Categorías Railway</h1>
+            <p>Solución Ultra-Simplificada - Solo Tabla Categorías</p>
+        </div>
+        
+        <div class="content">
+            <?php if (!$export): ?>
+                <div class="highlight">
+                    <h3>🚨 Error Específico a Resolver</h3>
+                    <div class="code-box">
+                        ❌ Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'railway.categorias' doesn't exist
+                    </div>
+                    <p><strong>Solución:</strong> Crear SOLO la tabla categorías primero, sin complicaciones.</p>
+                </div>
+                
+                <div class="info-box">
+                    <h3>🎯 ¿Qué hace este Fix?</h3>
+                    <ol>
+                        <li><strong>Elimina</strong> la tabla categorías si existe</li>
+                        <li><strong>Crea</strong> la estructura de la tabla categorías</li>
+                        <li><strong>Inserta</strong> todos los datos de categorías</li>
+                        <li><strong>Nada más</strong> - Solo se enfoca en categorías</li>
+                    </ol>
+                </div>
+                
+                <div class="info-box warning">
+                    <h3>⚡ Estrategia Ultra-Simple</h3>
+                    <p>En lugar de intentar importar toda la base de datos de una vez:</p>
+                    <ul>
+                        <li>✅ Primero arreglamos SOLO las categorías</li>
+                        <li>✅ Verificamos que el cotizador carga las categorías</li>
+                        <li>✅ Después importamos el resto de tablas</li>
+                    </ul>
+                </div>
+                
+                <form method="POST" style="text-align: center; margin: 30px 0;">
+                    <button type="submit" name="export" class="btn btn-success" style="font-size: 18px; padding: 20px 40px;">
+                        🎯 CREAR FIX SOLO CATEGORÍAS
+                    </button>
+                </form>
+                
+            <?php elseif ($export['success']): ?>
+                <div class="info-box success">
+                    <h3>✅ Fix de Categorías Generado</h3>
+                    <table>
+                        <tr><th>Parámetro</th><th>Valor</th></tr>
+                        <tr><td>Enfoque</td><td><strong>Solo tabla categorías</strong></td></tr>
+                        <tr><td>Registros de categorías</td><td><?php echo $export['records']; ?></td></tr>
+                        <tr><td>Tamaño del archivo</td><td><?php echo number_format($export['size'] / 1024, 2); ?> KB</td></tr>
+                        <tr><td>Fecha</td><td><?php echo date('Y-m-d H:i:s'); ?></td></tr>
+                    </table>
+                </div>
+                
+                <?php if ($downloadReady): ?>
+                    <?php $filename = 'fix_categorias_railway_' . date('Y-m-d_H-i-s') . '.sql'; ?>
+                    
+                    <div class="info-box">
+                        <h3>📥 Descargar Fix de Categorías</h3>
+                        <p style="text-align: center;">
+                            <a href="?download=<?php echo $filename; ?>" class="btn btn-primary" style="font-size: 18px; padding: 15px 30px;">
+                                💾 DESCARGAR <?php echo basename($filename); ?>
+                            </a>
+                        </p>
+                    </div>
+                    
+                    <div class="highlight">
+                        <h3>🚀 Pasos Siguientes</h3>
+                        <ol>
+                            <li><strong>Descargar</strong> el archivo de arriba</li>
+                            <li><strong>Ir a Railway:</strong> <a href="https://cotizadorcompany-production.up.railway.app/upload_database_completa_standalone.php" target="_blank" class="btn btn-primary">🚂 Upload Railway</a></li>
+                            <li><strong>Subir SOLO este archivo</strong> (que contiene solo categorías)</li>
+                            <li><strong>Ejecutar importación</strong></li>
+                            <li><strong>Probar cotizador</strong> - debería cargar las categorías</li>
+                            <li><strong>Si funciona,</strong> entonces importar el resto de tablas</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>🔍 Verificar Resultado</h3>
+                        <p>Después de subir este fix, ve al cotizador:</p>
+                        <p><a href="https://cotizadorcompany-production.up.railway.app/cotizador.php" target="_blank" class="btn">🎯 Probar Cotizador</a></p>
+                        <p>Si ya no aparece "Error al cargar las categorías", ¡el fix funcionó!</p>
+                    </div>
+                <?php endif; ?>
+                
+            <?php else: ?>
+                <div class="info-box error">
+                    <h3>❌ Error al Generar Fix</h3>
+                    <p><strong>Error:</strong> <?php echo $export['error']; ?></p>
+                    <p><a href="?" class="btn">🔄 Intentar de Nuevo</a></p>
+                </div>
+            <?php endif; ?>
+            
+            <div class="info-box">
+                <h3>🔗 Enlaces de Diagnóstico</h3>
+                <a href="diagnostico_railway.php" class="btn">🔍 Diagnóstico Local</a>
+                <a href="https://cotizadorcompany-production.up.railway.app/diagnostico_railway.php" class="btn" target="_blank">🚂 Diagnóstico Railway</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

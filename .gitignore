@@ -3,22 +3,38 @@ config.php
 config_local.php
 config_railway.php
 
-# Archivos de base de datos
+# Archivos de base de datos y backups SQL
 *.sql
 *.db
 *.sqlite
+company_presupuestos_*.sql
+cotizador_*.sql
+fix_categorias_*.sql
 
-# Logs
+# Logs y archivos de debug
 *.log
 logs/
 error.log
 access.log
+diagnostico_railway.txt
+*_debug.log
+presupuestos_debug.log
+adicionales_debug.log
+pdf_debug.log
 
-# Archivos temporales
+# Archivos temporales y de desarrollo
 *.tmp
 *.temp
 temp/
 tmp/
+debug_*.php
+diagnostico_*.php
+test_*.php
+verificar_*.php
+crear_*.php
+solucion_*.php
+comparar_*.php
+exportar_*.php
 
 # Archivos del sistema
 .DS_Store
@@ -36,6 +52,7 @@ desktop.ini
 *.bak
 *.backup
 backup/
+backups/
 
 # Archivos de caché
 cache/
@@ -44,7 +61,7 @@ cache/
 # Archivos de sesión PHP
 sessions/
 
-# Archivos de uploads (si los hay)
+# Archivos de uploads
 uploads/
 files/
 
@@ -61,33 +78,35 @@ composer.lock
 .env.local
 .env.production
 
-# Archivos de logs
-*_debug.log
-presupuestos_debug.log
-adicionales_debug.log
-pdf_debug.log
-
 # Archivos de Excel temporales
 ~$*.xlsx
 ~$*.xls
+plantilla_importacion.xlsx
+formato_excel_ejemplo.html
 
 # Archivos PDF generados
 presupuestos/*.pdf
 
-# Archivos de configuración local
-.env
-.env.local
-
-# Directorios de backups
-backups/
-
-# Archivos específicos del proyecto que no deben subirse
-plantilla_importacion.xlsx
-formato_excel_ejemplo.html
+# Archivos específicos de desarrollo y testing
+setup_results.html
+test_simple.html
+test_*.html
+*_test.php
+*_debug.php
 
 # Archivos de configuración de Railway (se incluyen)
 # railway.json
 # nixpacks.toml
 
-# Archivos de prueba local
-setup_results.html 
+# Archivos de scripts de desarrollo
+actualizar_*.php
+importar_*.php
+sincronizar_*.php
+deploy_*.php
+setup_*.php
+upload_*.php
+limpiar_*.php
+normalizar_*.php
+inicializar_*.php
+switch_*.php
+sync_*.php 

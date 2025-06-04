@@ -1229,7 +1229,7 @@
                     if (opcion.nombre && opcion.nombre.toLowerCase().includes('restar')) {
                         return `<span style="color: var(--accent-warning);">-AR$${precioFormateado}</span>`;
                     } else {
-                        return `AR$${precioFormateado}`;
+                    return `AR$${precioFormateado}`;
                     }
                 }
                 
@@ -1505,7 +1505,7 @@
                         subtotal -= parseFloat(precio);
                         console.log(`Restando ${precio} por adicional (${currentDelivery} días): ${opcion.nombre}`);
                     } else {
-                        subtotal += parseFloat(precio);
+                    subtotal += parseFloat(precio);
                         console.log(`Sumando ${precio} por producto (${currentDelivery} días): ${opcion.nombre}`);
                     }
                 }
