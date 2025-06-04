@@ -241,4 +241,8 @@ Para soporte técnico o consultas:
 - 🔄 Integración con Google Sheets
 - 🔄 Notificaciones por email
 - 🔄 Historial de cotizaciones
-- �� Reportes avanzados 
+- 🔄 Reportes avanzados
+
+---
+
+**Última actualización**: Sistema configurado para Railway con credenciales específicas ✅ 
