@@ -1,4 +1,4 @@
-# 🏢 Sistema de Presupuestos Online - Ascensores con panel
+# 🏢 Sistema de Presupuestos Online - Ascensores con panel #####
 
 Sistema completo de cotización y presupuestos para ascensores, montacargas y salvaescaleras con funcionalidades avanzadas de filtrado inteligente y cálculo automático.
 
