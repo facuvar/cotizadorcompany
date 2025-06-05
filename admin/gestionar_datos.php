@@ -902,6 +902,10 @@ if (isset($_GET['error'])) {
                     <span id="nav-import-icon"></span>
                     <span>Importar Excel</span>
                 </a>
+                <a href="ajustar_precios.php" class="sidebar-item">
+                    <span id="nav-prices-icon"></span>
+                    <span>Ajustar Precios</span>
+                </a>
                 <div style="margin-top: auto; padding: var(--spacing-md);">
                     <a href="../cotizador.php" class="sidebar-item" target="_blank">
                         <span id="nav-calculator-icon"></span>
@@ -1413,6 +1417,7 @@ if (isset($_GET['error'])) {
             document.getElementById('nav-data-icon').innerHTML = modernUI.getIcon('settings');
             document.getElementById('nav-quotes-icon').innerHTML = modernUI.getIcon('document');
             document.getElementById('nav-import-icon').innerHTML = modernUI.getIcon('upload');
+            document.getElementById('nav-prices-icon').innerHTML = modernUI.getIcon('dollar');
             document.getElementById('nav-calculator-icon').innerHTML = modernUI.getIcon('cart');
             document.getElementById('nav-logout-icon').innerHTML = modernUI.getIcon('logout');
             

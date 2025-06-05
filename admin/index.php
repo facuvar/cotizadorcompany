@@ -444,6 +444,10 @@ if ($isLoggedIn) {
                     <span id="nav-import-icon"></span>
                     <span>Importar Excel</span>
                 </a>
+                <a href="ajustar_precios.php" class="sidebar-item">
+                    <span id="nav-prices-icon"></span>
+                    <span>Ajustar Precios</span>
+                </a>
                 <div style="margin-top: auto; padding: var(--spacing-md);">
                     <a href="../cotizador.php" class="sidebar-item" target="_blank">
                         <span id="nav-calculator-icon"></span>
@@ -515,6 +519,16 @@ if ($isLoggedIn) {
                             <div>
                                 <div style="font-weight: 600;">Importar Excel</div>
                                 <div style="font-size: var(--text-xs); color: var(--text-secondary);">Actualizar datos</div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-card" onclick="location.href='ajustar_precios.php'">
+                            <div class="action-icon" style="background: var(--accent-info);">
+                                <span id="action-prices-icon"></span>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">Ajustar Precios</div>
+                                <div style="font-size: var(--text-xs); color: var(--text-secondary);">Incrementar/Disminuir</div>
                             </div>
                         </div>
                     </div>
@@ -715,6 +729,7 @@ if ($isLoggedIn) {
             document.getElementById('nav-data-icon').innerHTML = modernUI.getIcon('settings');
             document.getElementById('nav-quotes-icon').innerHTML = modernUI.getIcon('document');
             document.getElementById('nav-import-icon').innerHTML = modernUI.getIcon('upload');
+            document.getElementById('nav-prices-icon').innerHTML = modernUI.getIcon('dollar');
             document.getElementById('nav-calculator-icon').innerHTML = modernUI.getIcon('cart');
             document.getElementById('nav-logout-icon').innerHTML = modernUI.getIcon('logout');
             
@@ -722,6 +737,7 @@ if ($isLoggedIn) {
             document.getElementById('action-new-icon').innerHTML = modernUI.getIcon('add', 'icon-lg');
             document.getElementById('action-data-icon').innerHTML = modernUI.getIcon('settings', 'icon-lg');
             document.getElementById('action-import-icon').innerHTML = modernUI.getIcon('upload', 'icon-lg');
+            document.getElementById('action-prices-icon').innerHTML = modernUI.getIcon('dollar', 'icon-lg');
             
             // Stat icons
             document.getElementById('stat-quotes-icon').innerHTML = modernUI.getIcon('document', 'icon-lg');
