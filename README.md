@@ -1,10 +1,10 @@
-# 🏢 Sistema de Presupuestos Online - Ascensores con panel
+# 🏢 Sistema de Presupuestos Online - Ascensores con panel #####
 
 Sistema completo de cotización y presupuestos para ascensores, montacargas y salvaescaleras con funcionalidades avanzadas de filtrado inteligente y cálculo automático.
 
 ## 🚀 Características Principales
 
-### ✨ Funcionalidades Avanzadas
+### ✨  Funcionalidades Avanzadas
 - **Filtrado Inteligente**: Los adicionales se muestran automáticamente según el tipo de ascensor seleccionado
 - **Selección Exclusiva de Puertas**: Solo se puede elegir un tipo de puerta por ascensor (900, 1000, 1200/1300, 1800mm)
 - **Cálculos Dinámicos**: Precios que se actualizan en tiempo real con diferentes plazos de entrega
