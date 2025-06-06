@@ -214,7 +214,25 @@ function formatearPrecio($precio) {
                                             <h6 class="text-muted">Teléfono</h6>
                                             <p class="fs-5"><?php echo htmlspecialchars($presupuesto['telefono']); ?></p>
                                         </div>
+                                        <?php if (!empty($presupuesto['ubicacion_obra'])): ?>
+                                        <div class="col-md-6">
+                                            <h6 class="text-muted">Ubicación de la Obra</h6>
+                                            <p class="fs-5"><?php echo htmlspecialchars($presupuesto['ubicacion_obra']); ?></p>
+                                        </div>
+                                        <?php endif; ?>
                                     </div>
+                                    
+                                    <?php if (!empty($presupuesto['observaciones'])): ?>
+                                    <h5 class="border-bottom pb-2 mb-3">Observaciones del Cliente</h5>
+                                    <div class="row mb-4">
+                                        <div class="col-12">
+                                            <div class="alert alert-info">
+                                                <i class="bi bi-chat-text me-2"></i>
+                                                <?php echo nl2br(htmlspecialchars($presupuesto['observaciones'])); ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
                                     
                                     <h5 class="border-bottom pb-2 mb-3">Producto Seleccionado</h5>
                                     <div class="row mb-4">

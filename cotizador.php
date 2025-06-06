@@ -590,18 +590,7 @@
             </div>
             
             <div class="header-actions">
-                <a href="admin/gestionar_datos.php" class="btn btn-secondary">
-                    <span id="admin-icon"></span>
-                    Gestionar Orden
-                </a>
-                <a href="index_moderno.php" class="btn btn-secondary">
-                    <span id="home-icon"></span>
-                    Inicio
-                </a>
-                <button class="btn btn-primary" onclick="showCustomerForm()" id="generate-quote-btn" disabled>
-                    <span id="pdf-icon"></span>
-                    Generar PDF
-                </button>
+                <!-- Botones removidos según solicitud -->
             </div>
         </div>
     </header>
@@ -611,10 +600,10 @@
         <!-- Sección de Opciones -->
         <div class="content-section">
             <div class="content-header">
-                <h1 class="content-title">Configura tu Ascensor</h1>
+                <h1 class="content-title">Cotizador de Ascensores</h1>
                 <p class="content-description">
-                    Selecciona las características y opciones que necesitas para tu ascensor. 
-                    El precio se calculará automáticamente según tus selecciones.
+                    <strong>Presupuesto por equipo individual:</strong> Selecciona las características y opciones que necesitas para <em>un ascensor</em>. 
+                    El precio se calculará automáticamente según tus selecciones. Para múltiples ascensores, realiza una cotización por cada equipo.
                 </p>
             </div>
 
@@ -735,6 +724,18 @@
                     <input type="text" name="empresa" class="form-control">
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">¿Ubicación de la obra? *</label>
+                    <input type="text" name="ubicacion_obra" class="form-control" required placeholder="Ingrese la dirección completa de la obra...">
+                    <small class="form-help">Dirección donde se realizará la instalación del ascensor.</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Observaciones adicionales</label>
+                    <textarea name="observaciones" class="form-control" rows="3" placeholder="Ingrese cualquier observación o requerimiento especial..."></textarea>
+                    <small class="form-help">Estas observaciones aparecerán en el presupuesto y podrán ser revisadas por nuestro equipo técnico.</small>
+                </div>
+
                 <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-xl);">
                     <button type="button" class="btn btn-secondary" onclick="hideCustomerForm()">
                         Cancelar
@@ -760,9 +761,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Cargar iconos SVG
             document.getElementById('logo-icon').innerHTML = modernUI.getIcon('chart');
-            document.getElementById('admin-icon').innerHTML = modernUI.getIcon('settings');
-            document.getElementById('home-icon').innerHTML = modernUI.getIcon('home');
-            document.getElementById('pdf-icon').innerHTML = modernUI.getIcon('pdf');
             document.getElementById('pdf-icon-2').innerHTML = modernUI.getIcon('pdf');
             document.getElementById('reset-icon').innerHTML = modernUI.getIcon('refresh');
             document.getElementById('download-icon').innerHTML = modernUI.getIcon('download');
@@ -1307,13 +1305,80 @@
                     filtrarAdicionales();
                 }
             } else {
-                // Lógica normal para ADICIONALES (múltiple selección)
-                checkboxElement.classList.toggle('checked', isChecked);
+                // NUEVA LÓGICA: Manejo de grupos mutuamente excluyentes para puertas de ascensores
+                const nombreOpcion = opcion.nombre.toLowerCase();
                 
-                if (isChecked) {
+                // Definir grupos mutuamente excluyentes
+                const gruposExcluyentes = [
+                    // Grupo 1: Puertas de Ascensores Electromecanicos
+                    [
+                        'ascensores electromecanicos adicional puertas de 900',
+                        'ascensores electromecanicos adicional puertas de 1000', 
+                        'ascensores electromecanicos adicional puertas de 1300',
+                        'ascensores electromecanicos adicional puertas de 1800'
+                    ],
+                    // Grupo 2: Puertas de Ascensores Hidraulicos
+                    [
+                        'ascensores hidraulicos adicional puertas de 900',
+                        'ascensores hidraulicos adicional puertas de 1000',
+                        'ascensores hidraulicos adicional puertas de 1200', 
+                        'ascensores hidraulicos adicional puertas de 1800'
+                    ],
+                    // Grupo 3: Indicadores de Ascensores Electromecanicos
+                    [
+                        'ascensores electromecanicos adicional indicador led alfa num 1, 2',
+                        'ascensores electromecanicos adicional indicador led alfa num 0, 8',
+                        'ascensores electromecanicos adicional indicador lcd color 5'
+                    ]
+                ];
+                
+                // Verificar si la opción actual pertenece a algún grupo excluyente
+                let grupoExcluyente = null;
+                for (let grupo of gruposExcluyentes) {
+                    if (grupo.some(nombreItem => nombreOpcion.includes(nombreItem))) {
+                        grupoExcluyente = grupo;
+                        break;
+                    }
+                }
+                
+                if (grupoExcluyente && isChecked) {
+                    console.log('Opción con exclusión mutua detectada, aplicando para grupo:', grupoExcluyente);
+                    
+                    // Deseleccionar todas las otras opciones del mismo grupo excluyente
+                    selectedOptions.filter(id => {
+                        const otherOption = opciones.find(op => op.id == id);
+                        if (!otherOption) return false;
+                        
+                        const otherNombre = otherOption.nombre.toLowerCase();
+                        return grupoExcluyente.some(nombreItem => 
+                            otherNombre.includes(nombreItem) && id != optionId
+                        );
+                    }).forEach(id => {
+                        removeSelectedOption(id);
+                        // Actualizar visualmente el checkbox
+                        const otherCheckbox = document.querySelector(`[data-option-id="${id}"].option-checkbox`);
+                        if (otherCheckbox) {
+                            const otherInput = otherCheckbox.querySelector('input');
+                            if (otherInput) {
+                                otherInput.checked = false;
+                                otherCheckbox.classList.remove('checked');
+                            }
+                        }
+                        console.log('Deseleccionada opción del grupo excluyente:', otherOption.nombre);
+                    });
+                    
+                    // Seleccionar la nueva opción
                     addSelectedOption(optionId);
+                    checkboxElement.classList.add('checked');
                 } else {
-                    removeSelectedOption(optionId);
+                    // Lógica normal para ADICIONALES (múltiple selección)
+                    checkboxElement.classList.toggle('checked', isChecked);
+                    
+                    if (isChecked) {
+                        addSelectedOption(optionId);
+                    } else {
+                        removeSelectedOption(optionId);
+                    }
                 }
             }
             
@@ -1356,8 +1421,41 @@
                 const opcionAscensor = opciones.find(op => op.id == ascensorSeleccionado);
                 console.log('Ascensor seleccionado:', opcionAscensor?.nombre);
                 
-                // Si se selecciona electromecánico O gearless, mostrar solo adicionales con "electromecanico"
+                // NUEVA REGLA: Si se selecciona giracoches o montaplatos, NO mostrar adicionales
                 if (opcionAscensor && 
+                    (opcionAscensor.nombre.toLowerCase().includes('giracoches') || 
+                     opcionAscensor.nombre.toLowerCase().includes('montaplatos'))) {
+                    
+                    adicionalesFiltrados = [];
+                    console.log('Giracoches o Montaplatos seleccionado: NO se muestran adicionales');
+                    
+                    // Deseleccionar automáticamente cualquier adicional que esté seleccionado
+                    const adicionalesSeleccionados = selectedOptions.filter(id => {
+                        const opcion = opciones.find(op => op.id == id);
+                        return opcion && parseInt(opcion.categoria_id) === parseInt(categoriaAdicionales.id);
+                    });
+                    
+                    adicionalesSeleccionados.forEach(id => {
+                        removeSelectedOption(id);
+                        // Actualizar visualmente el checkbox
+                        const checkbox = document.querySelector(`[data-option-id="${id}"].option-checkbox`);
+                        if (checkbox) {
+                            const input = checkbox.querySelector('input');
+                            if (input) {
+                                input.checked = false;
+                                checkbox.classList.remove('checked');
+                            }
+                        }
+                    });
+                    
+                    if (adicionalesSeleccionados.length > 0) {
+                        console.log(`Deseleccionados ${adicionalesSeleccionados.length} adicionales automáticamente`);
+                        updateTotals();
+                        updateSelectedItems();
+                    }
+                }
+                // Si se selecciona electromecánico O gearless, mostrar solo adicionales con "electromecanico"
+                else if (opcionAscensor && 
                     (opcionAscensor.nombre.toLowerCase().includes('electromecanico') || 
                      opcionAscensor.nombre.toLowerCase().includes('gearless'))) {
                     
@@ -1414,40 +1512,54 @@
             // Actualizar el contador de opciones disponibles
             const categoryCount = categoryCard.querySelector('.category-count');
             if (categoryCount) {
-                categoryCount.textContent = `${adicionalesFiltrados.length} opciones disponibles`;
+                if (adicionalesFiltrados.length === 0) {
+                    categoryCount.textContent = 'No disponible para este producto';
+                } else {
+                    categoryCount.textContent = `${adicionalesFiltrados.length} opciones disponibles`;
+                }
             }
             
             // Actualizar las opciones mostradas
             const categoryOptions = categoryCard.querySelector('.category-options');
             if (categoryOptions) {
-                // Mapear iconos según el nombre de la categoría
-                let iconName = 'tool'; // Para adicionales
-                
-                const htmlOptions = adicionalesFiltrados.map(opcion => `
-                    <div class="option-item" data-categoria-id="${categoria.id}" onclick="handleOptionClick(${opcion.id})">
-                        <div class="option-checkbox" data-option-id="${opcion.id}">
-                            <input type="checkbox" data-option-id="${opcion.id}" onclick="event.stopPropagation(); handleOptionClick(${opcion.id});" ${selectedOptions.includes(opcion.id) ? 'checked' : ''}>
+                if (adicionalesFiltrados.length === 0) {
+                    // Mostrar mensaje cuando no hay adicionales disponibles
+                    categoryOptions.innerHTML = `
+                        <div style="padding: var(--spacing-lg); text-align: center; color: var(--text-muted);">
+                            <div style="margin-bottom: var(--spacing-sm);">
+                                ${modernUI.getIcon('info-circle')}
+                            </div>
+                            <p>Los giracoches y montaplatos no requieren adicionales.</p>
                         </div>
-                        <div class="option-details">
-                            <div class="option-name">${opcion.nombre}</div>
-                            <div class="option-price" id="price-${opcion.id}">
-                                ${getOptionPrice(opcion)}
+                    `;
+                } else {
+                    // Mostrar opciones normalmente
+                    const htmlOptions = adicionalesFiltrados.map(opcion => `
+                        <div class="option-item" data-categoria-id="${categoria.id}" onclick="handleOptionClick(${opcion.id})">
+                            <div class="option-checkbox" data-option-id="${opcion.id}">
+                                <input type="checkbox" data-option-id="${opcion.id}" onclick="event.stopPropagation(); handleOptionClick(${opcion.id});" ${selectedOptions.includes(opcion.id) ? 'checked' : ''}>
+                            </div>
+                            <div class="option-details">
+                                <div class="option-name">${opcion.nombre}</div>
+                                <div class="option-price" id="price-${opcion.id}">
+                                    ${getOptionPrice(opcion)}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `);
-                
-                categoryOptions.innerHTML = htmlOptions.join('');
-                
-                // Actualizar el estado visual de los checkboxes seleccionados
-                adicionalesFiltrados.forEach(opcion => {
-                    if (selectedOptions.includes(opcion.id)) {
-                        const checkbox = categoryOptions.querySelector(`[data-option-id="${opcion.id}"].option-checkbox`);
-                        if (checkbox) {
-                            checkbox.classList.add('checked');
+                    `);
+                    
+                    categoryOptions.innerHTML = htmlOptions.join('');
+                    
+                    // Actualizar el estado visual de los checkboxes seleccionados
+                    adicionalesFiltrados.forEach(opcion => {
+                        if (selectedOptions.includes(opcion.id)) {
+                            const checkbox = categoryOptions.querySelector(`[data-option-id="${opcion.id}"].option-checkbox`);
+                            if (checkbox) {
+                                checkbox.classList.add('checked');
+                            }
                         }
-                    }
-                });
+                    });
+                }
                 
                 console.log(`Adicionales actualizados: ${adicionalesFiltrados.length} opciones mostradas`);
             }
@@ -1598,6 +1710,7 @@
             console.log('- Email:', formData.get('email'));
             console.log('- Teléfono:', formData.get('telefono'));
             console.log('- Empresa:', formData.get('empresa'));
+            console.log('- Observaciones:', formData.get('observaciones'));
             console.log('- Opciones:', formData.get('opciones'));
             console.log('- Plazo:', formData.get('plazo'));
             console.log('- Opciones seleccionadas:', selectedOptions);

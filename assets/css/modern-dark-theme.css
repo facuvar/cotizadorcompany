@@ -537,4 +537,13 @@ select.form-control {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
-} 
+}
+
+/* Estilo para texto de ayuda en formularios */
+.form-help {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: var(--spacing-xs);
+  line-height: 1.4;
+}

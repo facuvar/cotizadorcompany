@@ -212,6 +212,8 @@ $stats = [
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             overflow: hidden;
+            min-width: 1000px;
+            width: 100%;
         }
 
         .table-header {
@@ -225,11 +227,12 @@ $stats = [
 
         .table-row {
             display: grid;
-            grid-template-columns: 70px 1.7fr 180px 100px 130px 110px 130px;
+            grid-template-columns: 70px 1fr 160px 80px 110px 90px 200px;
             padding: var(--spacing-md);
             border-bottom: 1px solid var(--border-color);
             align-items: center;
             transition: background 0.2s ease;
+            min-width: 800px;
         }
 
         .table-row:hover:not(.table-header) {
@@ -289,10 +292,10 @@ $stats = [
             gap: var(--spacing-xs);
         }
 
-        .status-badge.pendiente {
+        /* .status-badge.pendiente {
             background: rgba(245, 158, 11, 0.2);
             color: #fbbf24;
-        }
+        } */
 
         .status-badge.completado {
             background: rgba(16, 185, 129, 0.2);
@@ -349,7 +352,8 @@ $stats = [
         /* Responsive */
         @media (max-width: 1024px) {
             .table-row {
-                grid-template-columns: 70px 1.5fr 160px 90px 110px 100px 120px;
+                grid-template-columns: 60px 1fr 140px 70px 90px 80px 180px;
+                min-width: 720px;
             }
             
             .btn-sm {
@@ -359,8 +363,18 @@ $stats = [
         
         @media (max-width: 768px) {
             .table-row {
-                grid-template-columns: 60px 1.3fr 140px 80px 100px 90px 110px;
+                grid-template-columns: 45px 1fr 110px 60px 80px 70px 170px;
                 font-size: var(--text-xs);
+                min-width: 635px;
+            }
+            
+            .btn-sm {
+                min-width: 28px !important;
+                padding: 4px !important;
+            }
+            
+            .presupuestos-table {
+                min-width: 650px;
             }
         }
     </style>
@@ -523,16 +537,17 @@ $stats = [
                 </div>
 
                 <!-- Tabla de Presupuestos -->
-                <div class="presupuestos-table">
-                    <div class="table-row table-header">
-                        <div class="table-cell">ID</div>
-                        <div class="table-cell">Cliente</div>
-                        <div class="table-cell">Total</div>
-                        <div class="table-cell">Items</div>
-                        <div class="table-cell">Fecha</div>
-                        <div class="table-cell">Estado</div>
-                        <div class="table-cell">Acciones</div>
-                    </div>
+                <div style="overflow-x: auto; width: 100%;">
+                    <div class="presupuestos-table">
+                        <div class="table-row table-header">
+                            <div class="table-cell">ID</div>
+                            <div class="table-cell">Cliente</div>
+                            <div class="table-cell">Total</div>
+                            <div class="table-cell">Items</div>
+                            <div class="table-cell">Fecha</div>
+                            <!-- <div class="table-cell">Estado</div> -->
+                            <div class="table-cell">Acciones</div>
+                        </div>
                     
                     <?php if (empty($presupuestos)): ?>
                     <div class="empty-state">
@@ -582,28 +597,30 @@ $stats = [
                                 echo $fecha->format('d/m/Y H:i');
                                 ?>
                             </div>
-                            <div class="table-cell">
+                            <!-- <div class="table-cell">
                                 <span class="status-badge pendiente">
                                     <span id="status-icon-<?php echo $presupuesto['id']; ?>"></span>
                                     Pendiente
                                 </span>
-                            </div>
-                            <div class="table-cell">
-                                <div style="display: flex; gap: var(--spacing-sm); justify-content: flex-start;">
+                            </div> -->
+                            <div class="table-cell" style="padding-right: var(--spacing-lg); min-width: 150px;">
+                                <div style="display: flex; gap: 6px; justify-content: flex-start; flex-wrap: nowrap; width: 100%; min-width: 140px;">
                                     <button class="btn btn-sm btn-secondary" 
                                             onclick="verPresupuesto(<?php echo $presupuesto['id']; ?>)"
-                                            title="Ver detalle">
+                                            title="Ver detalle"
+                                            style="min-width: 32px; width: 32px; height: 32px; padding: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <span id="view-icon-<?php echo $presupuesto['id']; ?>"></span>
                                     </button>
                                     <button class="btn btn-sm btn-secondary" 
                                             onclick="descargarPDF(<?php echo $presupuesto['id']; ?>)"
-                                            title="Descargar PDF">
+                                            title="Descargar PDF"
+                                            style="min-width: 32px; width: 32px; height: 32px; padding: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <span id="pdf-icon-<?php echo $presupuesto['id']; ?>"></span>
                                     </button>
                                     <button class="btn btn-sm btn-secondary" 
                                             onclick="confirmarEliminar(<?php echo $presupuesto['id']; ?>)"
                                             title="Eliminar presupuesto"
-                                            style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: #ef4444;">
+                                            style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: #ef4444; min-width: 32px; width: 32px; height: 32px; padding: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <span id="delete-icon-<?php echo $presupuesto['id']; ?>"></span>
                                     </button>
                                 </div>
@@ -611,6 +628,7 @@ $stats = [
                         </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
+                    </div>
                 </div>
 
                 <!-- Paginación (simulada) -->
@@ -659,7 +677,7 @@ $stats = [
             
             // Table icons
             <?php foreach ($presupuestos as $presupuesto): ?>
-            document.getElementById('status-icon-<?php echo $presupuesto['id']; ?>').innerHTML = modernUI.getIcon('clock', 'icon-sm');
+            // document.getElementById('status-icon-<?php echo $presupuesto['id']; ?>').innerHTML = modernUI.getIcon('clock', 'icon-sm');
             document.getElementById('view-icon-<?php echo $presupuesto['id']; ?>').innerHTML = modernUI.getIcon('eye', 'icon-sm');
             document.getElementById('pdf-icon-<?php echo $presupuesto['id']; ?>').innerHTML = modernUI.getIcon('pdf', 'icon-sm');
             document.getElementById('delete-icon-<?php echo $presupuesto['id']; ?>').innerHTML = modernUI.getIcon('trash', 'icon-sm');

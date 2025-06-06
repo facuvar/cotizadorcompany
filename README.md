@@ -6,6 +6,7 @@ Sistema completo de cotización y presupuestos para ascensores, montacargas y sa
 
 ### ✨ Funcionalidades Avanzadas
 - **Filtrado Inteligente**: Los adicionales se muestran automáticamente según el tipo de ascensor seleccionado
+- **Selección Exclusiva de Puertas**: Solo se puede elegir un tipo de puerta por ascensor (900, 1000, 1200/1300, 1800mm)
 - **Cálculos Dinámicos**: Precios que se actualizan en tiempo real con diferentes plazos de entrega
 - **Gestión de Adicionales**: Soporte para adicionales que suman o restan del precio total
 - **Exportación PDF**: Generación automática de presupuestos en formato PDF
@@ -107,6 +108,25 @@ El sistema filtra automáticamente los adicionales según el tipo de ascensor:
 - **Hidráulico**: Adicionales específicos para sistemas hidráulicos
 - **Montacargas**: Adicionales para transporte de carga
 - **Salvaescaleras**: Adicionales para accesibilidad
+
+### Selección Exclusiva de Puertas
+Para los adicionales de puertas de ascensores, el sistema implementa lógica de exclusión mutua:
+
+#### Ascensores Electromecánicos
+Solo se puede seleccionar **una** de estas opciones:
+- Puertas de 900mm
+- Puertas de 1000mm  
+- Puertas de 1300mm
+- Puertas de 1800mm
+
+#### Ascensores Hidráulicos
+Solo se puede seleccionar **una** de estas opciones:
+- Puertas de 900mm
+- Puertas de 1000mm
+- Puertas de 1200mm
+- Puertas de 1800mm
+
+**Comportamiento**: Al seleccionar una puerta, automáticamente se deselecciona cualquier otra puerta del mismo grupo, ya que son mutuamente excluyentes. Otros adicionales pueden seguir seleccionándose normalmente.
 
 ### Sistema de Precios Dinámicos
 ```javascript

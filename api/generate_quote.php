@@ -51,11 +51,17 @@ try {
     $email = $_POST['email'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $empresa = $_POST['empresa'] ?? '';
+    $ubicacion_obra = $_POST['ubicacion_obra'] ?? '';
+    $observaciones = $_POST['observaciones'] ?? '';
     $opciones_json = $_POST['opciones'] ?? '';
     $plazo = $_POST['plazo'] ?? '90';
     
     if (empty($nombre) || empty($email)) {
         throw new Exception('Nombre y email son requeridos');
+    }
+    
+    if (empty($ubicacion_obra)) {
+        throw new Exception('La ubicación de la obra es requerida');
     }
     
     if (empty($opciones_json)) {
@@ -87,6 +93,8 @@ try {
             cliente_email VARCHAR(100) NOT NULL,
             cliente_telefono VARCHAR(20),
             cliente_empresa VARCHAR(100),
+            ubicacion_obra TEXT,
+            observaciones TEXT,
             subtotal DECIMAL(10,2) NOT NULL DEFAULT 0,
             descuento_porcentaje DECIMAL(5,2) NOT NULL DEFAULT 0,
             descuento_monto DECIMAL(10,2) NOT NULL DEFAULT 0,
@@ -109,6 +117,28 @@ try {
             $alter_table = "ALTER TABLE presupuestos ADD COLUMN plazo_entrega VARCHAR(10) AFTER total";
             if (!$conn->query($alter_table)) {
                 throw new Exception('Error al agregar la columna plazo_entrega: ' . $conn->error);
+            }
+        }
+        
+        // Verificamos si la columna ubicacion_obra existe
+        $column_check = $conn->query("SHOW COLUMNS FROM presupuestos LIKE 'ubicacion_obra'");
+        
+        if ($column_check->num_rows == 0) {
+            // La columna no existe, la creamos
+            $alter_table = "ALTER TABLE presupuestos ADD COLUMN ubicacion_obra TEXT AFTER cliente_empresa";
+            if (!$conn->query($alter_table)) {
+                throw new Exception('Error al agregar la columna ubicacion_obra: ' . $conn->error);
+            }
+        }
+        
+        // Verificamos si la columna observaciones existe
+        $column_check = $conn->query("SHOW COLUMNS FROM presupuestos LIKE 'observaciones'");
+        
+        if ($column_check->num_rows == 0) {
+            // La columna no existe, la creamos
+            $alter_table = "ALTER TABLE presupuestos ADD COLUMN observaciones TEXT AFTER ubicacion_obra";
+            if (!$conn->query($alter_table)) {
+                throw new Exception('Error al agregar la columna observaciones: ' . $conn->error);
             }
         }
     }
@@ -181,13 +211,15 @@ try {
         cliente_email, 
         cliente_telefono, 
         cliente_empresa,
+        ubicacion_obra,
+        observaciones,
         subtotal,
         descuento_porcentaje,
         descuento_monto,
         total,
         plazo_entrega,
         created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
     
     $stmt = $conn->prepare($insert_query);
     if (!$stmt) {
@@ -195,12 +227,14 @@ try {
     }
     
     $stmt->bind_param(
-        'sssssdddds',
+        'sssssssdddds',
         $numero_presupuesto,
         $nombre,
         $email,
         $telefono,
         $empresa,
+        $ubicacion_obra,
+        $observaciones,
         $subtotal,
         $descuento_porcentaje,
         $descuento,

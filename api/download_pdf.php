@@ -321,7 +321,21 @@ function generarHTMLPresupuesto($presupuesto, $opciones_detalles = []) {
                     <span class='label'>Validez:</span> 30 días
                 </div>
             </div>
-        </div>
+        </div>";
+        
+    // Agregar observaciones si existen
+    if (!empty($presupuesto['observaciones'])) {
+        $html .= "
+        
+        <div style='margin: 30px 0;'>
+            <div class='section-title'>Observaciones del Cliente</div>
+            <div style='background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #3b82f6; margin-top: 10px; white-space: pre-wrap; line-height: 1.6;'>
+                " . htmlspecialchars($presupuesto['observaciones']) . "
+            </div>
+        </div>";
+    }
+    
+    $html .= "
         
         <div class='items-section'>
             <div class='section-title'>Configuración del Ascensor</div>

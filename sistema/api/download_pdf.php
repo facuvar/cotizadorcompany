@@ -240,6 +240,13 @@ function generarHTMLPresupuesto($presupuesto) {
                 </div>";
     }
     
+    if (!empty($presupuesto['ubicacion_obra'])) {
+        $html .= "
+                <div class='info-row'>
+                    <span class='label'>Ubicación:</span> {$presupuesto['ubicacion_obra']}
+                </div>";
+    }
+    
     $html .= "
             </div>
             

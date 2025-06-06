@@ -44,21 +44,48 @@ try {
     if ($result && $result->num_rows > 0) {
         $presupuesto = $result->fetch_assoc();
         
-        // Decodificar items
-        $opciones_json = $presupuesto['opciones_json'] ?? '[]';
-        $opciones_ids = json_decode($opciones_json, true) ?: [];
-        
-        // Obtener detalles de cada opción
-        if (!empty($opciones_ids)) {
-            $placeholders = str_repeat('?,', count($opciones_ids) - 1) . '?';
-            $query = "SELECT o.*, c.nombre as categoria_nombre 
-                     FROM opciones o 
+        // Obtener items del presupuesto
+        // Verificar si existe opciones_json
+        if (isset($presupuesto['opciones_json']) && !empty($presupuesto['opciones_json'])) {
+            // Método 1: Desde opciones_json
+            $opciones_json = $presupuesto['opciones_json'];
+            $opciones_data = json_decode($opciones_json, true);
+            
+            if (is_array($opciones_data)) {
+                if (isset($opciones_data['opciones_ids'])) {
+                    $opciones_ids = $opciones_data['opciones_ids'];
+                } else {
+                    $opciones_ids = $opciones_data;
+                }
+                
+                if (!empty($opciones_ids)) {
+                    $placeholders = str_repeat('?,', count($opciones_ids) - 1) . '?';
+                    $query = "SELECT o.*, c.nombre as categoria_nombre 
+                             FROM opciones o 
+                             LEFT JOIN categorias c ON o.categoria_id = c.id 
+                             WHERE o.id IN ($placeholders)";
+                    
+                    $stmt = $conn->prepare($query);
+                    $types = str_repeat('i', count($opciones_ids));
+                    $stmt->bind_param($types, ...$opciones_ids);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    
+                    while ($row = $result->fetch_assoc()) {
+                        $items[] = $row;
+                    }
+                }
+            }
+        } else {
+            // Método 2: Desde tabla presupuesto_detalles
+            $query = "SELECT o.*, c.nombre as categoria_nombre, pd.precio as precio_detalle
+                     FROM presupuesto_detalles pd
+                     JOIN opciones o ON pd.opcion_id = o.id
                      LEFT JOIN categorias c ON o.categoria_id = c.id 
-                     WHERE o.id IN ($placeholders)";
+                     WHERE pd.presupuesto_id = ?";
             
             $stmt = $conn->prepare($query);
-            $types = str_repeat('i', count($opciones_ids));
-            $stmt->bind_param($types, ...$opciones_ids);
+            $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
             
@@ -469,10 +496,6 @@ $total = $subtotal - $descuento;
                     <div class="quote-header-top">
                         <div class="quote-id-section">
                             <h1 class="quote-id">Presupuesto #<?php echo $presupuesto['id']; ?></h1>
-                            <span class="quote-status">
-                                <span id="status-icon"></span>
-                                Pendiente
-                            </span>
                         </div>
                         <div>
                             <span class="badge badge-info">
@@ -487,7 +510,7 @@ $total = $subtotal - $descuento;
                             <span class="meta-label">Fecha de creación</span>
                             <span class="meta-value">
                                 <?php 
-                                $fecha = new DateTime($presupuesto['fecha_creacion']);
+                                $fecha = new DateTime($presupuesto['created_at']);
                                 echo $fecha->format('d/m/Y H:i');
                                 ?>
                             </span>
@@ -499,7 +522,7 @@ $total = $subtotal - $descuento;
                         <div class="meta-item">
                             <span class="meta-label">Valor total</span>
                             <span class="meta-value" style="color: var(--accent-success); font-size: var(--text-lg);">
-                                €<?php echo number_format($presupuesto['total'], 2, ',', '.'); ?>
+                                $<?php echo number_format($presupuesto['total'], 2, ',', '.'); ?>
                             </span>
                         </div>
                     </div>
@@ -509,7 +532,7 @@ $total = $subtotal - $descuento;
                 <div class="client-section">
                     <div class="client-header">
                         <div class="client-avatar">
-                            <?php echo strtoupper(substr($presupuesto['nombre_cliente'] ?? 'C', 0, 1)); ?>
+                            <?php echo strtoupper(substr($presupuesto['cliente_nombre'] ?? $presupuesto['nombre_cliente'] ?? 'C', 0, 1)); ?>
                         </div>
                         <h3>Información del Cliente</h3>
                     </div>
@@ -517,16 +540,30 @@ $total = $subtotal - $descuento;
                     <div class="client-details">
                         <div class="meta-item">
                             <span class="meta-label">Nombre</span>
-                            <span class="meta-value"><?php echo htmlspecialchars($presupuesto['nombre_cliente'] ?? 'No especificado'); ?></span>
+                            <span class="meta-value"><?php echo htmlspecialchars($presupuesto['cliente_nombre'] ?? $presupuesto['nombre_cliente'] ?? 'No especificado'); ?></span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">Email</span>
-                            <span class="meta-value"><?php echo htmlspecialchars($presupuesto['email_cliente'] ?? 'No especificado'); ?></span>
+                            <span class="meta-value"><?php echo htmlspecialchars($presupuesto['cliente_email'] ?? $presupuesto['email_cliente'] ?? 'No especificado'); ?></span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">Teléfono</span>
-                            <span class="meta-value"><?php echo htmlspecialchars($presupuesto['telefono_cliente'] ?? 'No especificado'); ?></span>
+                            <span class="meta-value"><?php echo htmlspecialchars($presupuesto['cliente_telefono'] ?? $presupuesto['telefono_cliente'] ?? 'No especificado'); ?></span>
                         </div>
+                        <?php if (!empty($presupuesto['ubicacion_obra'])): ?>
+                        <div class="meta-item">
+                            <span class="meta-label">Ubicación de la obra</span>
+                            <span class="meta-value"><?php echo htmlspecialchars($presupuesto['ubicacion_obra']); ?></span>
+                        </div>
+                        <?php endif; ?>
+                        <?php if (!empty($presupuesto['observaciones'])): ?>
+                        <div class="meta-item" style="grid-column: 1 / -1;">
+                            <span class="meta-label">Observaciones del cliente</span>
+                            <div class="meta-value" style="background: var(--bg-secondary); padding: var(--spacing-md); border-radius: var(--radius-md); margin-top: var(--spacing-xs); white-space: pre-wrap; line-height: 1.5;">
+                                <?php echo htmlspecialchars($presupuesto['observaciones']); ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -575,7 +612,7 @@ $total = $subtotal - $descuento;
                                 if ($item['categoria_id'] == 3 && $item['descuento'] > 0) {
                                     echo $item['descuento'] . '% desc.';
                                 } else {
-                                    echo '€' . number_format($precio, 2, ',', '.');
+                                    echo '$' . number_format($precio, 2, ',', '.');
                                 }
                                 ?>
                             </div>
@@ -584,7 +621,7 @@ $total = $subtotal - $descuento;
                                 if ($item['categoria_id'] == 3 && $item['descuento'] > 0) {
                                     echo '-';
                                 } else {
-                                    echo '€' . number_format($precio, 2, ',', '.');
+                                    echo '$' . number_format($precio, 2, ',', '.');
                                 }
                                 ?>
                             </div>
@@ -597,19 +634,19 @@ $total = $subtotal - $descuento;
                 <div class="totals-section">
                     <div class="total-row subtotal">
                         <span>Subtotal</span>
-                        <span>€<?php echo number_format($subtotal, 2, ',', '.'); ?></span>
+                        <span>$<?php echo number_format($subtotal, 2, ',', '.'); ?></span>
                     </div>
                     
                     <?php if ($descuento_porcentaje > 0): ?>
                     <div class="total-row discount">
                         <span>Descuento (<?php echo $descuento_porcentaje; ?>%)</span>
-                        <span>-€<?php echo number_format($descuento, 2, ',', '.'); ?></span>
+                        <span>-$<?php echo number_format($descuento, 2, ',', '.'); ?></span>
                     </div>
                     <?php endif; ?>
                     
                     <div class="total-row final">
                         <span>Total</span>
-                        <span class="total-value">€<?php echo number_format($total, 2, ',', '.'); ?></span>
+                        <span class="total-value">$<?php echo number_format($total, 2, ',', '.'); ?></span>
                     </div>
                 </div>
 
@@ -629,15 +666,7 @@ $total = $subtotal - $descuento;
                         </div>
                     </div>
                     
-                    <div class="timeline-item">
-                        <div class="timeline-icon">
-                            <span id="timeline-pending-icon"></span>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-title">Pendiente de aprobación</div>
-                            <div class="timeline-date">Esperando respuesta del cliente</div>
-                        </div>
-                    </div>
+                    <!-- Timeline item removido: ya no mostramos estados -->
                 </div>
             </div>
         </main>
@@ -662,12 +691,12 @@ $total = $subtotal - $descuento;
             document.getElementById('pdf-icon').innerHTML = modernUI.getIcon('pdf');
             
             // Quote
-            document.getElementById('status-icon').innerHTML = modernUI.getIcon('clock', 'icon-sm');
+            // document.getElementById('status-icon').innerHTML = modernUI.getIcon('clock', 'icon-sm');
             document.getElementById('delivery-icon').innerHTML = modernUI.getIcon('calendar', 'icon-sm');
             
             // Timeline
             document.getElementById('timeline-created-icon').innerHTML = modernUI.getIcon('check');
-            document.getElementById('timeline-pending-icon').innerHTML = modernUI.getIcon('clock');
+            // document.getElementById('timeline-pending-icon').innerHTML = modernUI.getIcon('clock');
         });
 
         function descargarPDF() {
