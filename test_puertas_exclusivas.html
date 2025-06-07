@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Puertas Exclusivas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-title {
+            color: #e50009;
+            border-bottom: 2px solid #e50009;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .option-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .option-group h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option-item:hover {
+            background-color: #f8f9fa;
+        }
+        .option-item.selected {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .option-checkbox {
+            margin-right: 10px;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">🧪 Test - Funcionalidad de Puertas Exclusivas</h1>
+        <p>Esta página simula la lógica de exclusión mutua implementada en el cotizador principal.</p>
+        
+        <div class="option-group">
+            <h3>🔧 Ascensores Electromecánicos - Adicionales de Puertas</h3>
+            <p><em>Solo se puede seleccionar una opción:</em></p>
+            
+            <div class="option-item" data-group="electromecanico" data-option="900">
+                <input type="checkbox" class="option-checkbox" id="electro-900">
+                <label for="electro-900">Ascensores Electromecanicos Adicional Puertas de 900</label>
+            </div>
+            
+            <div class="option-item" data-group="electromecanico" data-option="1000">
+                <input type="checkbox" class="option-checkbox" id="electro-1000">
+                <label for="electro-1000">Ascensores Electromecanicos Adicional Puertas de 1000</label>
+            </div>
+            
+            <div class="option-item" data-group="electromecanico" data-option="1300">
+                <input type="checkbox" class="option-checkbox" id="electro-1300">
+                <label for="electro-1300">Ascensores Electromecanicos Adicional Puertas de 1300</label>
+            </div>
+            
+            <div class="option-item" data-group="electromecanico" data-option="1800">
+                <input type="checkbox" class="option-checkbox" id="electro-1800">
+                <label for="electro-1800">Ascensores Electromecanicos Adicional Puertas de 1800</label>
+            </div>
+        </div>
+        
+        <div class="option-group">
+            <h3>💧 Ascensores Hidráulicos - Adicionales de Puertas</h3>
+            <p><em>Solo se puede seleccionar una opción:</em></p>
+            
+            <div class="option-item" data-group="hidraulico" data-option="900">
+                <input type="checkbox" class="option-checkbox" id="hidra-900">
+                <label for="hidra-900">Ascensores Hidraulicos adicional puertas de 900</label>
+            </div>
+            
+            <div class="option-item" data-group="hidraulico" data-option="1000">
+                <input type="checkbox" class="option-checkbox" id="hidra-1000">
+                <label for="hidra-1000">Ascensores Hidraulicos adicional puertas de 1000</label>
+            </div>
+            
+            <div class="option-item" data-group="hidraulico" data-option="1200">
+                <input type="checkbox" class="option-checkbox" id="hidra-1200">
+                <label for="hidra-1200">Ascensores Hidraulicos adicional puertas de 1200</label>
+            </div>
+            
+            <div class="option-item" data-group="hidraulico" data-option="1800">
+                <input type="checkbox" class="option-checkbox" id="hidra-1800">
+                <label for="hidra-1800">Ascensores Hidraulicos adicional puertas de 1800</label>
+            </div>
+        </div>
+        
+        <div class="option-group">
+            <h3>🔧 Otros Adicionales (Selección Múltiple)</h3>
+            <p><em>Estos se pueden seleccionar normalmente:</em></p>
+            
+            <div class="option-item" data-group="otros" data-option="adicional1">
+                <input type="checkbox" class="option-checkbox" id="otros-1">
+                <label for="otros-1">Adicional Cabina 2,25M3</label>
+            </div>
+            
+            <div class="option-item" data-group="otros" data-option="adicional2">
+                <input type="checkbox" class="option-checkbox" id="otros-2">
+                <label for="otros-2">Adicional Piso en Acero</label>
+            </div>
+            
+            <div class="option-item" data-group="otros" data-option="adicional3">
+                <input type="checkbox" class="option-checkbox" id="otros-3">
+                <label for="otros-3">Sistema UPS</label>
+            </div>
+        </div>
+        
+        <div id="status" class="status info">
+            Selecciona opciones para probar la funcionalidad de exclusión mutua.
+        </div>
+    </div>
+
+    <script>
+        function handleOptionClick(event) {
+            const checkbox = event.target;
+            const optionItem = checkbox.closest('.option-item');
+            const grupo = optionItem.getAttribute('data-group');
+            const opcion = optionItem.getAttribute('data-option');
+            
+            console.log('Opción clickeada:', grupo, opcion, 'Checked:', checkbox.checked);
+            
+            // Si es un grupo de puertas excluyentes y se está seleccionando
+            if ((grupo === 'electromecanico' || grupo === 'hidraulico') && checkbox.checked) {
+                // Deseleccionar todas las otras opciones del mismo grupo
+                const otrasOpciones = document.querySelectorAll(`[data-group="${grupo}"] input[type="checkbox"]`);
+                otrasOpciones.forEach(otroCheckbox => {
+                    if (otroCheckbox !== checkbox) {
+                        otroCheckbox.checked = false;
+                        otroCheckbox.closest('.option-item').classList.remove('selected');
+                    }
+                });
+                
+                updateStatus(`✅ Seleccionada puerta de ${opcion}mm para ${grupo}. Otras puertas del mismo tipo deseleccionadas automáticamente.`);
+            } else if (grupo === 'otros') {
+                updateStatus(`ℹ️ Adicional "${opcion}" ${checkbox.checked ? 'seleccionado' : 'deseleccionado'}. Los otros adicionales no se ven afectados.`);
+            } else {
+                updateStatus(`ℹ️ Puerta de ${opcion}mm para ${grupo} deseleccionada.`);
+            }
+            
+            // Actualizar estado visual
+            if (checkbox.checked) {
+                optionItem.classList.add('selected');
+            } else {
+                optionItem.classList.remove('selected');
+            }
+        }
+
+        function updateStatus(message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status success';
+            
+            // Volver al estado info después de 3 segundos
+            setTimeout(() => {
+                statusDiv.className = 'status info';
+                statusDiv.textContent = 'Selecciona opciones para probar la funcionalidad de exclusión mutua.';
+            }, 3000);
+        }
+
+        // Agregar event listeners a todos los checkboxes
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.option-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', handleOptionClick);
+            });
+            
+            console.log('Test de puertas exclusivas inicializado');
+        });
+    </script>
+</body>
+</html> 

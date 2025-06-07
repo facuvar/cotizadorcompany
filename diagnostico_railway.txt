@@ -1,0 +1,35 @@
+-- ========================================
+-- DIAGNÓSTICO RAILWAY - VERIFICAR TABLAS
+-- ========================================
+
+-- Mostrar todas las tablas existentes
+SHOW TABLES;
+
+-- Verificar si existe la tabla categorias
+SHOW TABLES LIKE 'categorias';
+
+-- Si existe, mostrar su estructura
+DESCRIBE categorias;
+
+-- Si existe, contar registros
+SELECT COUNT(*) as total_categorias FROM categorias;
+
+-- Si existe, mostrar contenido
+SELECT * FROM categorias ORDER BY id LIMIT 10;
+
+-- Verificar otras tablas importantes
+SHOW TABLES LIKE 'opciones';
+SHOW TABLES LIKE 'plazos_entrega';
+
+-- Mostrar información de la base de datos
+SELECT DATABASE() as base_datos_actual;
+SELECT VERSION() as version_mysql;
+
+-- ========================================
+-- RESULTADO ESPERADO:
+-- Si la tabla categorias existe, veremos:
+-- 1. Lista de tablas con 'categorias'
+-- 2. Estructura de la tabla
+-- 3. Número de registros
+-- 4. Contenido de las categorías
+-- ======================================== 
